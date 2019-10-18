@@ -78,7 +78,13 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        
+
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, whatIsGround);
+        if (isGrounded)
+        {
+            animator.SetBool(jumpBoolHash, false);
+        }
+
         if (isGrounded != true)
         {
             ifInAirSpeed = jumpSpeed;
@@ -87,16 +93,47 @@ public class PlayerController : MonoBehaviour
         {
             ifInAirSpeed = 1;
         }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("Jumped");
+
+            if (isGrounded && !haveJetPack)
+            {
+
+                JumpUp();
+            }
+
+            if (!isGrounded && touchingLeftWall)
+            {
+                runEnable = false;
+                transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
+                rigidBody.AddForce(new Vector2(wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
+                animator.SetBool(jumpBoolHash, true);
+
+            }
+
+            if (touchingRightWall == true && !isGrounded)
+            {
+                runEnable = false;
+                transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
+                rigidBody.AddForce(new Vector2(-wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
+                animator.SetBool(jumpBoolHash, true);
+            }
+        }
+
+        
     }
  
 
     private void FixedUpdate()
     {
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, whatIsGround);
-        if (isGrounded)
-        {
-            animator.SetBool(jumpBoolHash, false);
-        }
+        
+        //    isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, whatIsGround);
+        //if (isGrounded)
+        //{
+        //    animator.SetBool(jumpBoolHash, false);
+        //}
 
         if (!runEnable)
         {
@@ -104,7 +141,7 @@ public class PlayerController : MonoBehaviour
                 runEnable = true;
         }
 
-#if (UNITY_EDITOR)
+#if (UNITY_EDITOR || UNITY_STANDALONE)
 
 
 
@@ -160,34 +197,35 @@ public class PlayerController : MonoBehaviour
         //RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.right * transform.localScale.x, playerRayCastDistance, whatIsWall);
 
         //&& isGrounded == true && (!touchingLeftWall || !touchingRightWall)
-        if (Input.GetKeyDown(KeyCode.Space) )
-        {
-            Debug.Log("Jumped");
-            if (isGrounded && !haveJetPack)
-            {
-                
-                JumpUp();
-            }
+        //if (Input.GetKeyDown(KeyCode.Space) )
+        //{
+        //    // Debug.Log("Jumped");
+        //    if (isGrounded && !haveJetPack)
+        //    {
 
-            if (!isGrounded && touchingLeftWall)
-            {
-                runEnable = false;
-                transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
-                rigidBody.AddForce(new Vector2(wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
-                animator.SetBool(jumpBoolHash, true);
+        //        //JumpUp();
+        //        animator.SetBool(jumpBoolHash, true);
+        //    }
 
-            }
+        //    if (!isGrounded && touchingLeftWall)
+        //    {
+        //        //runEnable = false;
+        //        //transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
+        //        //rigidBody.AddForce(new Vector2(wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
+        //        animator.SetBool(jumpBoolHash, true);
 
-            if (touchingRightWall == true && !isGrounded)
-            {
-                runEnable = false;
-                transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
-                rigidBody.AddForce(new Vector2(-wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
-                animator.SetBool(jumpBoolHash, true);
-            }
+        //    }
 
-            
-        }
+        //    if (touchingRightWall == true && !isGrounded)
+        //    {
+        //        //runEnable = false;
+        //        //transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
+        //        //rigidBody.AddForce(new Vector2(-wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
+        //        animator.SetBool(jumpBoolHash, true);
+        //    }
+
+
+        //}
 
         if (Input.GetKey(KeyCode.Space) && haveJetPack)
         {

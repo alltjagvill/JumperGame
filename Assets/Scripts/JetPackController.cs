@@ -31,7 +31,7 @@ public class JetPackController : MonoBehaviour
         if (attachedToPlayer)
         {
 
-#if (UNITY_EDITOR)
+#if (UNITY_EDITOR || UNITY_STANDALONE)
             if (Input.GetKey(KeyCode.Space))
             {
                 internalJetpackFuel -= jetpackFuelDeplete * Time.fixedDeltaTime;
