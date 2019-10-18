@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - MovingPlatform
+  - Danger
+  - CameraPoint
+  - ClosingDoor
+  - LeftWall
+  - RightWall
   layers:
   - Default
   - TransparentFX
@@ -17,8 +22,8 @@ TagManager:
   - Player
   - Ground
   - Wall
-  - 
-  - 
+  - LeftWall
+  - RightWall
   - 
   - 
   - 

@@ -25,8 +25,7 @@ public class MovingPlatformController : MonoBehaviour
         if (goingToEndPoint == true )
         {
             transform.position = Vector2.MoveTowards(transform.position, endVec2Pos, speed * Time.deltaTime);
-            Debug.Log("Transform: " + transform.position);
-            Debug.Log("End: " + endPos.position);
+           
 
             if (transform.position == endPos.position)
             {
