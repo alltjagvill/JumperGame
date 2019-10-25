@@ -10,13 +10,18 @@ public class PlayerController : MonoBehaviour
     int jumpBoolHash = Animator.StringToHash("jumping");
     int jetpackBoolHash = Animator.StringToHash("jetPack");
 
-    private bool facingRight = true;
+    
     private bool onPlattform = false;
-    private bool haveJetPack = false;
+    public bool haveJetPack = false;
 
     public bool isGrounded;
     public bool jumpEnabled = true;
     public bool runEnable = true;
+
+    public bool touchJump = false;
+    public bool touchWalkLeft = false;
+    public bool touchWalkRight = false;
+    public bool touchJetpack = false;
 
     private float moveInput;
     private float tmpSpeed;
@@ -43,6 +48,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask whatIsGround;
     public LayerMask whatIsWall;
     public Camera mainCamera;
+    public GameManager gameManager;
 
     private CameraController mainCameraController;
     private SpriteRenderer spriteRenderer;
@@ -51,18 +57,8 @@ public class PlayerController : MonoBehaviour
 
     public delegate void Player();
     public static event Player OnDangerHit;
-    enum Direction
-    {
-        left,
-        right
-    }
-
-
-    
-
-
-    
-
+    public static event Player OnExitHit;
+   
   
     private void Start()
     {
@@ -94,6 +90,21 @@ public class PlayerController : MonoBehaviour
             ifInAirSpeed = 1;
         }
 
+        if(touchWalkLeft)
+        {
+            TouchWalk(-1);
+        }
+        if (touchWalkRight)
+        {
+            TouchWalk(1);
+        }
+
+        if (touchJetpack)
+        {
+            TouchJetpack();
+        }
+
+#if (UNITY_STANDALONE)
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("Jumped");
@@ -122,18 +133,15 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        
+#endif
+
     }
  
 
     private void FixedUpdate()
     {
         
-        //    isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, whatIsGround);
-        //if (isGrounded)
-        //{
-        //    animator.SetBool(jumpBoolHash, false);
-        //}
+       
 
         if (!runEnable)
         {
@@ -141,7 +149,7 @@ public class PlayerController : MonoBehaviour
                 runEnable = true;
         }
 
-#if (UNITY_EDITOR || UNITY_STANDALONE)
+#if (UNITY_STANDALONE)
 
 
 
@@ -194,71 +202,13 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        //RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.right * transform.localScale.x, playerRayCastDistance, whatIsWall);
-
-        //&& isGrounded == true && (!touchingLeftWall || !touchingRightWall)
-        //if (Input.GetKeyDown(KeyCode.Space) )
-        //{
-        //    // Debug.Log("Jumped");
-        //    if (isGrounded && !haveJetPack)
-        //    {
-
-        //        //JumpUp();
-        //        animator.SetBool(jumpBoolHash, true);
-        //    }
-
-        //    if (!isGrounded && touchingLeftWall)
-        //    {
-        //        //runEnable = false;
-        //        //transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
-        //        //rigidBody.AddForce(new Vector2(wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
-        //        animator.SetBool(jumpBoolHash, true);
-
-        //    }
-
-        //    if (touchingRightWall == true && !isGrounded)
-        //    {
-        //        //runEnable = false;
-        //        //transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
-        //        //rigidBody.AddForce(new Vector2(-wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
-        //        animator.SetBool(jumpBoolHash, true);
-        //    }
-
-
-        //}
+       
 
         if (Input.GetKey(KeyCode.Space) && haveJetPack)
         {
             rigidBody.velocity = Vector2.up * jetpackUpSpeed;
         }
-
-        //hit.collider != null
-        //if (Input.GetKeyDown(KeyCode.Space) && isGrounded == false && (touchingLeftWall || touchingRightWall) )
-        //{
-        //    //Walljumping
-        //    runEnable = false;
-
-        //    //rigidBody.velocity = new Vector2(wallJumpSpeed * hit.normal.x, wallJumpHeight);
-           
-        //        if (touchingLeftWall == true)
-        //        {
-        //            transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
-        //            rigidBody.AddForce(new Vector2(wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
-        //        }
-
-        //        if (touchingRightWall == true)
-        //        {
-        //            transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
-        //            rigidBody.AddForce(new Vector2(-wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
-        //        }
-            
-        //    // WallJump();
-        //}
-
-
-        
-        
-
+      
 #endif
 
     }
@@ -325,6 +275,11 @@ public class PlayerController : MonoBehaviour
             PlayerDied();
         }
 
+        if (col.gameObject.tag.Equals("Exit"))
+        {
+            LevelComplete();
+        }
+
     }
 
     public void JetpackAquired()
@@ -342,9 +297,17 @@ public class PlayerController : MonoBehaviour
         animator.SetBool(jetpackBoolHash, false);
     }
    
+    private void LevelComplete()
+    {
+        
+        if (OnExitHit != null)
+        {
+            OnExitHit();
+        }
+    }
     private void PlayerDied()
     {
-        Debug.Log("Im hit!");
+        
         Destroy(this);
         transform.Rotate(0, 0, 90);
 
@@ -352,5 +315,123 @@ public class PlayerController : MonoBehaviour
         {
             OnDangerHit();
         }
+    }
+
+    public void TouchJumping()
+    {
+        if (isGrounded && !haveJetPack)
+        {
+
+            JumpUp();
+        }
+
+        if (!isGrounded && touchingLeftWall)
+        {
+            runEnable = false;
+            transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
+            rigidBody.AddForce(new Vector2(wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
+            animator.SetBool(jumpBoolHash, true);
+
+        }
+
+        if (touchingRightWall == true && !isGrounded)
+        {
+            runEnable = false;
+            transform.localScale = transform.localScale.x == 1 ? new Vector2(-1, 1) : Vector2.one;
+            rigidBody.AddForce(new Vector2(-wallJumpSpeed, wallJumpHeight), ForceMode2D.Force);
+            animator.SetBool(jumpBoolHash, true);
+        }
+    }
+
+
+
+    public void TouchWalk(float moveInput)
+    {
+        //moveInput = -1;
+
+        if (moveInput == -1)
+        {
+            transform.localScale = new Vector2(-1, 1);
+
+            if (runEnable == true && !haveJetPack)
+            {
+                rigidBody.velocity = new Vector2(moveInput * moveSpeed * ifInAirSpeed, rigidBody.velocity.y);
+                animator.SetBool(leftPressedBoolHash, true);
+            }
+
+            if (haveJetPack)
+            {
+                rigidBody.velocity = new Vector2(moveInput * jetpackSideSpeed * ifInAirSpeed, rigidBody.velocity.y);
+            }
+        }
+
+        if (moveInput ==  1)
+
+        {
+            transform.localScale = new Vector2(1, 1);
+
+            if (runEnable == true && !haveJetPack)
+
+            {
+
+                rigidBody.velocity = new Vector2(moveInput * moveSpeed * ifInAirSpeed, rigidBody.velocity.y);
+                animator.SetBool(rightPressedBoolHash, true);
+            }
+
+            if (haveJetPack)
+            {
+                rigidBody.velocity = new Vector2(moveInput * jetpackSideSpeed * ifInAirSpeed, rigidBody.velocity.y);
+            }
+
+        }
+    }
+
+    private void TouchJetpack()
+    {
+        if (haveJetPack)
+        {
+            rigidBody.velocity = Vector2.up * jetpackUpSpeed;
+        }
+    }
+
+    public void TouchJumpSetTrue()
+    {
+        //touchJump = true;
+        Debug.Log("TOUCH JUMP");
+        animator.SetBool(jumpBoolHash, true);
+    }
+    //public void TouchJumpSetFalse()
+    //{
+    //    touchJump = false;
+    //}
+
+    public void TouchWalkLeftSetTrue()
+    {
+        touchWalkLeft = true;
+    }
+    public void TouchWalkLeftSetFalse()
+    {
+        touchWalkLeft = false;
+        animator.SetBool(leftPressedBoolHash, false);
+    }
+
+    public void TouchWalkRightSetTrue()
+    {
+        touchWalkRight = true;
+    }
+    public void TouchWalkRighttSetFalse()
+    {
+        touchWalkRight = false;
+        animator.SetBool(rightPressedBoolHash, false);
+    }
+
+    public void TouchJetpackSetTrue()
+    {
+        touchJetpack = true;
+    }
+
+    public void TouchJetpackSetFalse()
+    {
+        touchJetpack = false;
     }
 }

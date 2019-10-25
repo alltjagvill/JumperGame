@@ -5,9 +5,11 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject restartScreen;
+    
     public Camera mainCamera;
     public TextMeshPro timeCounterText;
+    public GameObject deadMenuUI;
+    public GameObject levlelCompleteUI;
 
     private RestartController restartController;
 
@@ -16,17 +18,14 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        PlayerController.OnDangerHit += EnableRestartScreen;
+        PlayerController.OnDangerHit += EnableDeadMenu;
+        PlayerController.OnExitHit += EnableNextLevelMenu;
     }
 
     private void OnDisable()
     {
-        PlayerController.OnDangerHit -= EnableRestartScreen;
-    }
-
-    void Start()
-    {
-        restartController = restartScreen.GetComponent<RestartController>();
+        PlayerController.OnDangerHit -= EnableDeadMenu;
+        PlayerController.OnExitHit -= EnableNextLevelMenu;
     }
 
     private void Update()
@@ -45,14 +44,14 @@ public class GameManager : MonoBehaviour
             secondsCount = 0;
         }
     }
-    private void EnableRestartScreen()
+    private void EnableDeadMenu()
     {
-
-
-        restartController.OnPlayerDead();
-        restartScreen.SetActive(true);
-
-        Debug.Log("RESTARTSCREEN");
+        deadMenuUI.SetActive(true);
     }
 
+    private void EnableNextLevelMenu()
+    {
+        levlelCompleteUI.SetActive(true);
+        Time.timeScale = 0f;
+    }
 }

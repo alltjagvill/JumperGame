@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6194835569263502758}
   - component: {fileID: 6194835569263502761}
   - component: {fileID: 6194835569263502760}
-  - component: {fileID: 6194835569263502756}
   - component: {fileID: 8431332787227678064}
   m_Layer: 0
   m_Name: Saw1
@@ -102,18 +101,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &6194835569263502756
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6194835569263502763}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0924809e4a90c24fa8b61a184e9e231, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!58 &8431332787227678064
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -17,6 +17,7 @@ public class JetPackController : MonoBehaviour
     private float internalJetpackFuel;
 
     private bool attachedToPlayer = false;
+    public bool touchJetpack = false;
 
     void Start()
     {
@@ -30,20 +31,21 @@ public class JetPackController : MonoBehaviour
         }
         if (attachedToPlayer)
         {
-
-#if (UNITY_EDITOR || UNITY_STANDALONE)
+            if (touchJetpack)
+            {
+                DepleteFuel();
+            }
+#if (UNITY_STANDALONE)
             if (Input.GetKey(KeyCode.Space))
             {
-                internalJetpackFuel -= jetpackFuelDeplete * Time.fixedDeltaTime;
-                
-                fueltank.DepleteBar(internalJetpackFuel/jetpackFuel);
+                DepleteFuel();
             }
 #endif
         }
     }
     private void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.gameObject.tag.Equals("Player"))
+        if (col.gameObject.tag.Equals("Jetpack"))
         {
             internalJetpackFuel = jetpackFuel;
             fueltank.SetFullTank();
@@ -63,5 +65,22 @@ public class JetPackController : MonoBehaviour
         internalJetpackFuel = jetpackFuel;
         attachedToPlayer = false;
         //interfaceController.DeactivateFueltank();
+    }
+
+    private void DepleteFuel()
+    {
+        internalJetpackFuel -= jetpackFuelDeplete * Time.fixedDeltaTime;
+
+        fueltank.DepleteBar(internalJetpackFuel / jetpackFuel);
+    }
+
+    public void TouchJetpackSetTrue()
+    {
+        touchJetpack = true;
+    }
+
+    public void TouchJetpackSetFalse()
+    {
+        touchJetpack = false;
     }
 }

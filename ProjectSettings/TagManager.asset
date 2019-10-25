@@ -10,6 +10,8 @@ TagManager:
   - ClosingDoor
   - LeftWall
   - RightWall
+  - Exit
+  - Jetpack
   layers:
   - Default
   - TransparentFX
